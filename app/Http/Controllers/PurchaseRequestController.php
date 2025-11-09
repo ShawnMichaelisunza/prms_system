@@ -6,13 +6,14 @@ use App\Models\PurchaseRequest;
 use App\Http\Requests\StorePurchaseRequestRequest;
 use App\Http\Requests\UpdatePurchaseRequestRequest;
 use App\Models\Cart;
+use App\Models\Checkout;
 use App\Models\Item;
 use App\Services\PurchaseRequestService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PurchaseRequestController extends Controller
 {
-
     protected $purchaseRequestService;
 
     public function __construct(PurchaseRequestService $purchaseRequestService)
@@ -25,15 +26,17 @@ class PurchaseRequestController extends Controller
     public function index()
     {
         $purchaseRequests = $this->purchaseRequestService->selectAllPurchaseRequestService();
-        return view('sidebar_links.purchase_requests.purchase-requests', ['purchaseRequests' => $purchaseRequests]);
+        $purchaseRequestPendings = $this->purchaseRequestService->selectAllPendingPurchaseRequestService();
+        $purchaseRequestCompletes = $this->purchaseRequestService->selectAllCompletedPurchaseRequestService();
+        return view('sidebar_links.purchase_requests.purchase-requests', ['purchaseRequests' => $purchaseRequests, 'purchaseRequestPendings' => $purchaseRequestPendings, 'purchaseRequestCompletes' => $purchaseRequestCompletes]);
     }
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function createPurchaseRequest()
     {
-    
         return view('sidebar_links.purchase_requests.purchase-request-form', ['purchaseRequest' => []]);
     }
 
@@ -42,11 +45,12 @@ class PurchaseRequestController extends Controller
      */
     public function storePurchaseRequest(StorePurchaseRequestRequest $storePurchaseRequestRequest)
     {
-        
         $validatedStorePurchaseRequest = $storePurchaseRequestRequest->validated();
         $purchaseRequest = $this->purchaseRequestService->storePurchaseRequestService($validatedStorePurchaseRequest);
 
-        return redirect()->route('purchase.requests.show', [ 'id' => encrypt($purchaseRequest->id) ])->with('success', 'Purchase Request created successfully!');
+        return redirect()
+            ->route('purchase.requests.show', ['id' => encrypt($purchaseRequest->id)])
+            ->with('success', 'Purchase Request created successfully!');
     }
 
     /**
@@ -54,11 +58,11 @@ class PurchaseRequestController extends Controller
      */
     public function showPurchaseRequest($id)
     {
-
         $purchaseRequest = $this->purchaseRequestService->showPurchaseRequestService($id);
         $items = Item::orderBy('created_at', 'DESC')->paginate(10);
+        $totalCarts = Cart::where('purchase_request_id', $purchaseRequest->id)->count();
 
-        return view('sidebar_links.purchase_requests.purchase-request-show', ['purchaseRequest' => $purchaseRequest, 'items' => $items]);
+        return view('sidebar_links.purchase_requests.purchase-request-show', ['purchaseRequest' => $purchaseRequest, 'items' => $items, 'totalCarts' => $totalCarts]);
     }
 
     /**
@@ -66,9 +70,8 @@ class PurchaseRequestController extends Controller
      */
     public function editPurchaseRequest($id)
     {
-
         $purchaseRequest = $this->purchaseRequestService->editPurchaseRequestService($id);
-         return view('sidebar_links.purchase_requests.purchase-request-form', ['purchaseRequest' => $purchaseRequest]);
+        return view('sidebar_links.purchase_requests.purchase-request-form', ['purchaseRequest' => $purchaseRequest]);
     }
 
     /**
@@ -89,5 +92,67 @@ class PurchaseRequestController extends Controller
     {
         $this->purchaseRequestService->destroyPurchaseRequestService($id);
         return redirect()->back()->with('success', 'Purchase Request deleted successfully!');
+    }
+
+    // add to cart
+
+    public function addCartPurchaseRequest(Request $request, $id)
+    {
+        $validatedCartItem = $request->validate([
+            'qty' => 'required|integer|min:1',
+        ]);
+
+        $purchaseRequestId = $this->purchaseRequestService->addPurchaseRequestCartStoreService($id);
+
+        Cart::create([
+            'user_id' => Auth::id(),
+            'purchase_request_id' => $purchaseRequestId->id,
+            'item_id' => $request->item_id,
+            'qty' => $validatedCartItem['qty'],
+        ]);
+
+        return redirect()->back()->with('success', 'Purchase request added to cart successfully!');
+    }
+
+    // view checkout
+    public function viewCheckoutPurchaseRequest($id)
+    {
+        $purchaseRequest = $this->purchaseRequestService->viewCartPurchaseRequestCartItemService($id);
+        $cartItems = Cart::where('purchase_request_id', $purchaseRequest->id)->orderBy('created_at', 'DESC')->get();
+        $totalCarts = Cart::where('purchase_request_id', $purchaseRequest->id)->count();
+
+        return view('sidebar_links.purchase_requests.partials.purchase-request-checkout', ['cartItems' => $cartItems, 'totalCarts' => $totalCarts, 'purchaseRequest' => $purchaseRequest]);
+    }
+
+    public function storeCheckoutPurchaseRequest(Request $request, $id)
+    {
+        $purchaseRequest = $this->purchaseRequestService->storeCheckoutPurchaseRequestCartItemService($id);
+        $purchaseRequest->pr_status = 'COMPLETED';
+        $purchaseRequest->update([
+            'pr_no' => 'PR' . now()->format('Y') . ' - ' . str_pad($purchaseRequest->id, 5, '0', STR_PAD_LEFT),
+        ]);
+
+        foreach ($request->cart_item_id as $index => $itemId) {
+            Checkout::create([
+                'user_id' => Auth::id(),
+                'purchase_request_id' => $purchaseRequest->id,
+                'cart_item_id' => $itemId,
+                'cart_requested_qty' => $request->cart_requested_qty[$index],
+            ]);
+        }
+
+        Cart::where('purchase_request_id', $purchaseRequest->id)->delete();
+
+        return redirect()-> route('purchase.requests.checkout.show', encrypt($purchaseRequest->id))->with('success', 'Purchase Request Completed!');
+    }
+
+
+    public function showCheckoutPurchaseRequest($id){
+
+        $PurchaseRequestCheckout = $this->purchaseRequestService->showCheckoutPurchaseRequestCartItemService($id);
+        $checkoutCartItems = Checkout::where('purchase_request_id', $PurchaseRequestCheckout->id)->orderBy('created_at', 'DESC')->get();
+        $totalcheckoutItems = Checkout::where('purchase_request_id', $PurchaseRequestCheckout->id)->count();
+
+        return view('sidebar_links.purchase_requests.partials.purchase-request-show-checkout', ['PurchaseRequestCheckout' => $PurchaseRequestCheckout, 'checkoutCartItems' => $checkoutCartItems,'totalcheckoutItems' => $totalcheckoutItems]);
     }
 }

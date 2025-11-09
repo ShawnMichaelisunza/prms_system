@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProfileController;
@@ -22,18 +23,29 @@ Route::middleware('auth')->group(function () {
     // Procurement Cycle ------------
 
     Route::controller(PurchaseRequestController::class)->group(function () {
+        // view all data
+        Route::get('/purchase_requests', 'index')->name('purchase.requests');
 
-        Route::get('/purchase.requests', 'index')->name('purchase.requests');
+        Route::get('/purchase_requests/create', 'createPurchaseRequest')->name('purchase.requests.create');
+        Route::post('/purchase_requests/store', 'storePurchaseRequest')->name('purchase.requests.store');
 
-        Route::get('/purchase.requests/create', 'createPurchaseRequest')->name('purchase.requests.create');
-        Route::post('/purchase.requests/store', 'storePurchaseRequest')->name('purchase.requests.store');
+        Route::get('/purchase_requests/show/{id}', 'showPurchaseRequest')->name('purchase.requests.show');
 
-        Route::get('/purchase.requests/show/{id}', 'showPurchaseRequest')->name('purchase.requests.show');
+        Route::get('/purchase_requests/edit/{id}', 'editPurchaseRequest')->name('purchase.requests.edit');
+        Route::put('/purchase_requests/update/{id}', 'updatePurchaseRequest')->name('purchase.requests.update');
 
-        Route::get('/purchase.requests/edit/{id}', 'editPurchaseRequest')->name('purchase.requests.edit');
-        Route::put('/purchase.requests/update/{id}', 'updatePurchaseRequest')->name('purchase.requests.update');
+        Route::delete('/purchase_requests/destroy/{id}', 'destroyPurchaseRequest')->name('purchase.requests.destroy');
 
-        Route::delete('/purchase.requests/destroy/{id}', 'destroyPurchaseRequest')->name('purchase.requests.destroy');
+        // add to cart
+
+        Route::post('/purchase_requests/cart/store/{id}', 'addCartPurchaseRequest')->name('purchase.requests.cart.store');
+
+        // checkout
+
+        Route::get('purchase_requests/view/checkout/{id}', 'viewCheckoutPurchaseRequest')->name('purchase.requests.checkout.view');
+        Route::post('purchase_requests/store/checkout/{id}', 'storeCheckoutPurchaseRequest')->name('purchase.requests.checkout.store');
+
+        Route::get('purchase_requests/show/checkout/{id}', 'showCheckoutPurchaseRequest')->name('purchase.requests.checkout.show');
     });
 
     // Actions ------------

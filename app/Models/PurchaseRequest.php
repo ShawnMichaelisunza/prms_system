@@ -22,6 +22,11 @@ class PurchaseRequest extends Model
 
         return $this->belongsTo(Organization::class, 'organization_id')->withDefault();
     }
+
+    public function carts(){
+
+        return $this->hasMany(Cart::class);
+    }
     
 
 }
