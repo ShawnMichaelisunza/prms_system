@@ -23,7 +23,7 @@
                 <td class="py-3 px-6 text-left">{{ $purchaseRequest->po_no }}</td>
                 <td class="py-3 px-6 text-left">{{ $purchaseRequest->rr_no }}</td>
                 <td class="py-3 px-6 text-left">
-                        @if ($purchaseRequest->pr_status == 'PENDING')
+                        @if ($purchaseRequest->pr_status == 'PENDING' && $purchaseRequest->pr_status != 'PENDING')
                             <span class="text-blue-500">{{ $purchaseRequest->pr_status }}</span>
                         @else
                             <span class="text-green-500">{{ $purchaseRequest->pr_status }}</span>

@@ -80,72 +80,90 @@
                     <div class="flex justify-center items-center">
                         <div class="grid grid-cols-4 gap-5">
                             @forelse ($items as $item)
-                                <form
-                                    action="{{ route('purchase.requests.cart.store', encrypt($purchaseRequest->id)) }}"
-                                    method="POST">
-                                    @csrf
-                                    <div
-                                        class="rounded-md overflow-hidden border border-gray-300 shadow-sm shadow-red-300 w-[320px] mb-5 p-1.5">
+                                <div x-data="{ inCart: {{ in_array($item->id, $cartItems) ? 'true' : 'false' }} }"
+                                    class="rounded-md overflow-hidden border border-gray-300 shadow-sm shadow-red-300 w-[320px] mb-5 p-1.5">
+                                    <form
+                                        action="{{ route('purchase.requests.cart.store', encrypt($purchaseRequest->id)) }}"
+                                        method="POST">
+                                        @csrf
+
                                         <img class="mb-5 h-[300px] w-full rounded-t-md"
                                             src="{{ asset('storage/' . $item->item_image) }}">
+
                                         <div class="mt-3 px-3">
                                             <div class="flex justify-between items-center">
                                                 <h1 class="font-semibold text-md uppercase text-gray-700">
                                                     {{ Str::limit($item->item_name, 20, '...') }}
                                                 </h1>
-                                                <h1 class="font-semibold text-md uppercase text-gray-700">₱
-                                                    {{ $item->price }}
-                                                </h1>
+                                                <h1 class="font-semibold text-md uppercase text-gray-700">
+                                                    ₱{{ $item->price }}</h1>
                                             </div>
                                             <p class="text-gray-500 font-medium">{{ $item->supplier->supplier_name }}
                                             </p>
                                         </div>
+
                                         <div class="flex justify-between items-end gap-2 px-3 mt-3 mb-1.5">
                                             <div class="grid">
-
-                                                {{-- hidden input --}}
                                                 <input type="hidden" value="{{ $item->id }}" name="item_id">
-                                                {{-- end hidden input --}}
-
-                                                <label for=""
-                                                    class="text-red-500 font-medium text-xs">Qty</label>
-                                                <input type="number" name="qty" value="{{ old('qty', 0) }}"
-                                                    min="0"
+                                                <input type="hidden" name="qty" value="{{ old('qty', 1) }}"
+                                                    min="1"
                                                     class="w-[70px] py-1 pl-2 text-sm border border-red-200 rounded-md text-gray-600">
                                             </div>
-                                            <div class="flex gap-1.5">
-                                                <button type="submit"
-                                                    class="text-blue-500 hover:text-green-500 underline">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="size-6 hover:size-7">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            @empty
-                                <p>No items available.</p>
-                            @endforelse
+
+                                            {{-- ADD TO CART BUTTON --}}
+                                            <button type="submit" x-show="!inCart" x-transition
+                                                class="text-white text-sm px-3 py-1 rounded-md bg-blue-600 no-underline hover:bg-blue-500 flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                                </svg>
+                                                Add to Cart
+                                            </button>
+                                    </form>
+                                    {{-- CANCEL BUTTON --}}
+                                    <form x-show="inCart"
+                                        action="{{ route('purchase.requests.cart.destroy', encrypt($purchaseRequest->id)) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="item_id" value="{{ $item->id }}">
+                                        <button type="submit"
+                                            class="text-white text-sm px-3 py-1 rounded-md bg-red-600 no-underline hover:bg-red-500 flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                                            </svg>
+                                            Cancel
+                                        </button>
+                                    </form>
+                                </div>
+
                         </div>
+                    @empty
+                        <p>No items available.</p>
+                        @endforelse
                     </div>
 
 
-                    {{-- checkout or edit cart --}}
 
-                    <div class="flex justify-end gap-3 m-5">
-                        <a href="{{ route('purchase.requests.checkout.view', encrypt($purchaseRequest->id)) }}"
-                            class="px-4 py-2 bg-blue-400 text-white text-sm rounded-md hover:bg-blue-500">Go to
-                            Checkout
-                        </a>
-                    </div>
                 </div>
 
-            </section>
 
+                {{-- checkout or edit cart --}}
 
+                <div class="flex justify-end gap-3 m-5">
+                    <a href="{{ route('purchase.requests.checkout.view', encrypt($purchaseRequest->id)) }}"
+                        class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-500">Go to
+                        Checkout
+                    </a>
+                </div>
         </div>
+
+        </section>
+
+
+    </div>
 </x-app-layout>

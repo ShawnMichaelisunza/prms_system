@@ -30,7 +30,7 @@
                     <td class="py-3 px-6 text-center">
                         <div class="flex item-center justify-center">
 
-                            @if ($purchaseRequest->pr_no != 'No PR-NO')
+                            @if ($purchaseRequest->pr_no != 'No PR-NO' && $purchaseRequest->pr_status != 'PENDING')
                                 {{-- show checkout --}}
                                 <a href="{{ route('purchase.requests.checkout.show', encrypt($purchaseRequest->id)) }}"
                                     class="w-4 mr-2 transform hover:text-blue-500 hover:scale-110">

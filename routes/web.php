@@ -4,6 +4,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -21,31 +22,57 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     // Procurement Cycle ------------
-
     Route::controller(PurchaseRequestController::class)->group(function () {
         // view all data
-        Route::get('/purchase_requests', 'index')->name('purchase.requests');
+        Route::get('/purchase-requests', 'index')->name('purchase.requests');
 
-        Route::get('/purchase_requests/create', 'createPurchaseRequest')->name('purchase.requests.create');
-        Route::post('/purchase_requests/store', 'storePurchaseRequest')->name('purchase.requests.store');
+        Route::get('/purchase-requests/create', 'createPurchaseRequest')->name('purchase.requests.create');
+        Route::post('/purchase-requests/store', 'storePurchaseRequest')->name('purchase.requests.store');
 
-        Route::get('/purchase_requests/show/{id}', 'showPurchaseRequest')->name('purchase.requests.show');
+        Route::get('/purchase-requests/show/{id}', 'showPurchaseRequest')->name('purchase.requests.show');
 
-        Route::get('/purchase_requests/edit/{id}', 'editPurchaseRequest')->name('purchase.requests.edit');
-        Route::put('/purchase_requests/update/{id}', 'updatePurchaseRequest')->name('purchase.requests.update');
+        Route::get('/purchase-requests/edit/{id}', 'editPurchaseRequest')->name('purchase.requests.edit');
+        Route::put('/purchase-requests/update/{id}', 'updatePurchaseRequest')->name('purchase.requests.update');
 
-        Route::delete('/purchase_requests/destroy/{id}', 'destroyPurchaseRequest')->name('purchase.requests.destroy');
+        Route::delete('/purchase-requests/destroy/{id}', 'destroyPurchaseRequest')->name('purchase.requests.destroy');
 
         // add to cart
 
-        Route::post('/purchase_requests/cart/store/{id}', 'addCartPurchaseRequest')->name('purchase.requests.cart.store');
+        Route::post('/purchase-requests/cart/store/{id}', 'addCartPurchaseRequest')->name('purchase.requests.cart.store');
+
+        // delete cart item 
+
+        Route::delete('/purchase-request/cart/delete/{id}', 'destroyCartPurchaseRequest')->name('purchase.requests.cart.destroy');
 
         // checkout
 
-        Route::get('purchase_requests/view/checkout/{id}', 'viewCheckoutPurchaseRequest')->name('purchase.requests.checkout.view');
-        Route::post('purchase_requests/store/checkout/{id}', 'storeCheckoutPurchaseRequest')->name('purchase.requests.checkout.store');
+        Route::get('purchase-requests/view/checkout/{id}', 'viewCheckoutPurchaseRequest')->name('purchase.requests.checkout.view');
+        Route::post('purchase-requests/store/checkout/{id}', 'storeCheckoutPurchaseRequest')->name('purchase.requests.checkout.store');
 
-        Route::get('purchase_requests/show/checkout/{id}', 'showCheckoutPurchaseRequest')->name('purchase.requests.checkout.show');
+        // show checkout
+        Route::get('purchase-requests/show/checkout/{id}', 'showCheckoutPurchaseRequest')->name('purchase.requests.checkout.show');
+        
+        // checkout pdf
+        Route::get('/purchase-request-completed/pdf/{id}', 'pdfCheckoutPurchaseRequest')->name('purchase.requests.checkout.pdf');
+    });
+
+    // Purchase Order ------------
+    Route::controller(PurchaseOrderController::class)->group(function(){
+
+        Route::get('/purchase-orders', 'index')->name('purchase.orders');
+
+        Route::get('/purchase-orders/create/{id}', 'createPurchaseOrder')->name('purchase.orders.create');
+        Route::post('/purchase-orders/store/{id}', 'storePurchaseOrder')->name('purchase.orders.store');
+
+        Route::get('/purchase-orders/edit/{id}', 'editPurchaseOrder')->name('purchase.orders.edit');
+        Route::put('/purchase-orders/update/{id}', 'updatePurchaseOrder')->name('purchase.orders.update');
+
+        Route::delete('/purchase-orders/destroy/{id}', 'destroyPurchaseOrder')->name('purchase.orders.destroy');
+
+
+        // checkout items 
+        Route::delete('/purchase-order/delete-item/{id}', 'destroyPurchaseOrderItem')->name('purchase.order.delete.item');
+
     });
 
     // Actions ------------

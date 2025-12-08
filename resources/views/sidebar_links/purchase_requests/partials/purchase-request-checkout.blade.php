@@ -71,10 +71,10 @@
                         method="POST">
                         @csrf
 
-                        <div class="grid grid-cols-1 gap-3 p-5 overflow-y-auto h-[350px]">
+                        <div class="grid grid-cols-1 gap-1 p-5 overflow-y-auto h-[350px]">
                             @forelse ($cartItems as $cartItem)
                                 <div
-                                    class="flex justify-between gap-3 bg-gray-100 shadow-md shadow-red-100 p-1.5 rounded-md">
+                                    class="flex justify-between gap-3 bg-gray-100 shadow-md shadow-red-100 p-1.5 rounded-md h-[135px]">
                                     <div class="w-3/12">
                                         <img src="{{ asset('storage/' . $cartItem->item->item_image) }}" alt=""
                                             class="h-[120px] w-[150px] rounded-l-md">
@@ -100,14 +100,14 @@
                                     <div class="px-2 w-full flex justify-end">
                                         <div class="grid gap-5 justify-between p-1">
                                             <div class="flex justify-end">
-                                                <a href="" class="text-red-500 hover:text-red-700">
+                                                <button type="submit" class="text-red-500 hover:text-red-700">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                         class="size-5">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                                     </svg>
-                                                </a>
+                                                </button>
                                             </div>
 
                                             {{-- Quantity Controls --}}
@@ -115,16 +115,20 @@
                                                 <div class="flex items-center space-x-1"
                                                     data-number="{{ $cartItem->qty }}">
                                                     <button type="button"
-                                                        class="btn-dec px-3 py-1 bg-red-300 text-white rounded">-</button>
+                                                        class="btn-dec px-3 py-1 bg-red-400 hover:bg-red-500 text-white rounded">-</button>
 
+                                                    {{-- hidden Inputs --}}
                                                     <input type="hidden" name="cart_item_id[]"
                                                         value="{{ $cartItem->item->id }}">
+                                                    <input type="hidden" name="cart_item_cost[]"
+                                                        value="{{ $cartItem->item->price }}">
+
                                                     <input type="text" name="cart_requested_qty[]"
                                                         class="qty w-9 text-center border border-gray-300 rounded text-xs"
                                                         readonly>
 
-                                                    <button type="button"
-                                                        class="btn-inc px-3 py-1 bg-green-300 text-white rounded">+</button>
+                                                    <button
+                                                        type="button"class="btn-inc px-3 py-1 bg-green-400 hover:bg-green-500 text-white rounded">+</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -138,7 +142,7 @@
                         {{-- Checkout Button --}}
                         <div class="flex justify-end gap-3 mx-5 mt-7 mb-5">
                             <button type="submit"
-                                class="px-4 py-2 bg-blue-400 text-white text-sm rounded-md hover:bg-blue-500">
+                                class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-500">
                                 Checkout
                             </button>
                         </div>
