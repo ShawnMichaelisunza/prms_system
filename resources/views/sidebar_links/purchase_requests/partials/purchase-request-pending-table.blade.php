@@ -16,7 +16,7 @@
             <tr class="border-b border-gray-200 hover:bg-gray-100">
                 <td class="py-3 px-6 text-left">{{ $purchaseRequest->user->name }}</td>
                 <td class="py-3 px-6 text-left">
-                    {{ Str::limit($purchaseRequest->purpose, 40, '...') }}</td>
+                    {{ Str::limit($purchaseRequest->purpose, 20, '...') }}</td>
                 <td class="py-3 px-6 text-left">{{ $purchaseRequest->pr_no }}</td>
                 <td class="py-3 px-6 text-left">{{ $purchaseRequest->po_no }}</td>
                 <td class="py-3 px-6 text-left">{{ $purchaseRequest->rr_no }}</td>

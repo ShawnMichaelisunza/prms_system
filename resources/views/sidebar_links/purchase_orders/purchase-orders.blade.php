@@ -47,9 +47,9 @@
                         <div x-show="tab === 'purchase_request_pending'" x-cloak>
                             @include('sidebar_links.purchase_orders.partials.purchase-orders-pending-table')
                         </div>
-                        {{-- <div x-show="tab === 'purchase_request_completed'" x-cloak>
-                            @include('sidebar_links.purchase_requests.partials.purchase-request-completed-table')
-                        </div> --}}
+                        <div x-show="tab === 'purchase_request_completed'" x-cloak>
+                            @include('sidebar_links.purchase_orders.partials.purchase-orders-completed-table')
+                        </div>
                     </div>
                 </div>
             </section>
@@ -62,7 +62,7 @@
     <script>
         function tabComponent() {
             return {
-                tab: 'activity_focused', // Default tab
+                tab: 'purchase_request_pending', // Default tab
 
                 init() {
                     const saved = localStorage.getItem('taskTabs');

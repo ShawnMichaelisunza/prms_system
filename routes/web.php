@@ -69,9 +69,11 @@ Route::middleware('auth')->group(function () {
 
         Route::delete('/purchase-orders/destroy/{id}', 'destroyPurchaseOrder')->name('purchase.orders.destroy');
 
-
         // checkout items 
-        Route::delete('/purchase-order/delete-item/{id}', 'destroyPurchaseOrderItem')->name('purchase.order.delete.item');
+        Route::delete('/purchase-order/delete-item/{id}', 'destroyPurchaseOrderItem')->name('purchase.orders.delete.item');
+
+        // purchase order pdf 
+        Route::get('/purchase-order-completed/pdf/{id}', 'pdfPurchaseOrder')->name('purchase.orders.pdf');
 
     });
 

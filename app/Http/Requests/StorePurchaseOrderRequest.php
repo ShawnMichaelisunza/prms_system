@@ -11,7 +11,7 @@ class StorePurchaseOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class StorePurchaseOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => ['required'],
+            'purchase_request_id' => ['required'],
+            'deliver_to' => ['required'],
+            'trade' => ['required'],
+            'payment_mode' => ['required'],
+            'payee' => ['required'],
+            'remarks' => ['nullable'],
+            'ship_fee' => ['nullable'],
+            'other_cost' => ['nullable'],
+            'discount' => ['nullable'],
+            'total_price' => ['required'],
         ];
     }
 }

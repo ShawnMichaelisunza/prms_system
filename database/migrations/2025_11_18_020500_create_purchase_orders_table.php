@@ -18,10 +18,10 @@ return new class extends Migration {
             $table->text('trade');
             $table->text('payment_mode');
             $table->string('payee');
-            $table->string('remarks');
-            $table->integer('ship_fee');
-            $table->integer('other_cost');
-            $table->integer('discount');
+            $table->string('remarks')->nullable();
+            $table->integer('ship_fee')->nullable();
+            $table->integer('other_cost')->nullable();
+            $table->integer('discount')->nullable();
             $table->integer('total_price');
             $table->text('po_status')->default('PENDING');
             $table->softDeletes();

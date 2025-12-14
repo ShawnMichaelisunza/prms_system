@@ -34,6 +34,8 @@
             {{ $slot }}
         </main>
 
+         @include('reusable_partials.right-nav-sidebar')
+
         @include('reusable_partials.flash-messages')
     </div>
 </body>

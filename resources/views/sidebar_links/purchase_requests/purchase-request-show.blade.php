@@ -81,19 +81,20 @@
                         <div class="grid grid-cols-4 gap-5">
                             @forelse ($items as $item)
                                 <div x-data="{ inCart: {{ in_array($item->id, $cartItems) ? 'true' : 'false' }} }"
-                                    class="rounded-md overflow-hidden border border-gray-300 shadow-sm shadow-red-300 w-[320px] mb-5 p-1.5">
+                                    class="rounded-md overflow-hidden border border-gray-300 shadow-sm shadow-red-300 
+                                    w-full max-w-xs mb-5 p-1.5">
                                     <form
                                         action="{{ route('purchase.requests.cart.store', encrypt($purchaseRequest->id)) }}"
                                         method="POST">
                                         @csrf
 
-                                        <img class="mb-5 h-[300px] w-full rounded-t-md"
+                                        <img class="mb-5 w-full h-[200px] md:h-[200px] rounded-t-md object-cover"
                                             src="{{ asset('storage/' . $item->item_image) }}">
 
                                         <div class="mt-3 px-3">
                                             <div class="flex justify-between items-center">
                                                 <h1 class="font-semibold text-md uppercase text-gray-700">
-                                                    {{ Str::limit($item->item_name, 20, '...') }}
+                                                    {{ Str::limit($item->item_name, 9, '...') }}
                                                 </h1>
                                                 <h1 class="font-semibold text-md uppercase text-gray-700">
                                                     ₱{{ $item->price }}</h1>

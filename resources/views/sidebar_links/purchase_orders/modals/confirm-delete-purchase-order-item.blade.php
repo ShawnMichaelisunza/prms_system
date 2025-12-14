@@ -9,7 +9,7 @@
 
 
 <dialog id="confirmSupplierDelete{{ $checkoutCartItem->id }}" class="p-6 bg-white rounded-lg shadow-xl border border-gray-300">
-    <form action="{{ route('purchase.order.delete.item', encrypt($checkoutCartItem->id)) }}" method="POST">
+    <form action="{{ route('purchase.orders.delete.item', encrypt($checkoutCartItem->id)) }}" method="POST">
         @method('DELETE')
         @csrf
 
